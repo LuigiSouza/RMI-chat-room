@@ -1,7 +1,12 @@
 package Room;
 
+import java.util.Map;
+
+import User.IUserChat;
+
 public class RoomChat {
     private String roomName;
+    private Map<String, IUserChat> userList;
 
     public RoomChat(String roomName) {
 
