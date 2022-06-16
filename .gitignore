@@ -1,4 +1,6 @@
 # Compiled class file
+.vscode
+.idea
 *.class
 
 # Log file
