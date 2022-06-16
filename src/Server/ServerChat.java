@@ -1,10 +1,17 @@
 package Server;
 
+import java.util.ArrayList;
+
 public class ServerChat implements IServerChat {
+    private ArrayList<String> roomList;
+
+    public ServerChat() {
+        
+    }
 
     @Override
-    public roomList getRooms() {
-        return null;
+    public ArrayList<String> getRooms() {
+        return roomList;
     }
 
     @Override
