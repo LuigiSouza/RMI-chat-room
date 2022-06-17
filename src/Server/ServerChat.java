@@ -1,7 +1,9 @@
 package Server;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import Room.IRoomChat;
 import Room.RoomChat;
 
 import java.rmi.Naming;
@@ -10,6 +12,8 @@ import java.rmi.server.UnicastRemoteObject;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
+
 
 public class ServerChat extends UnicastRemoteObject implements IServerChat {
     private ArrayList<String> roomList;
@@ -81,7 +85,31 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
     }
 
     private void createBtnActionListeners() {
-        
+        btnClose.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                List<String> deleteValues = list.getSelectedValuesList();
+                for(String s : deleteValues) {
+                    try {
+                        IRoomChat room = (IRoomChat) Naming.lookup("//localhost:2020/Salas/" + s);
+                        room.closeRoom();
+                        Naming.unbind("//localhost:2020/Salas/" + s);
+                        
+                        roomList.remove(s);
+                        listModel.removeElement(s);
+                    } catch (Exception ex) {
+                        System.out.println("Server error: " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        btnOpen.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String newRoomName = "Teste";
+                // createRoom();
+            }
+        });
     }
 
     @Override
