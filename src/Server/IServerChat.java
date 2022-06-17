@@ -1,8 +1,10 @@
 package Server;
 
 import java.util.ArrayList;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 
-public interface IServerChat extends java.rmi.Remote {
-    public ArrayList<String> getRooms();
-    public void createRoom(String roomName);
+public interface IServerChat extends Remote {
+    public ArrayList<String> getRooms() throws RemoteException;
+    public void createRoom(String roomName) throws RemoteException;
 }
