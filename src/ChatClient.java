@@ -10,7 +10,7 @@ public class ChatClient {
 
             System.out.println("Connecting to server...");
             IServerChat srv = (IServerChat) Naming.lookup("rmi://localhost:" + port + "/Server");
-            UserChat usr = new UserChat(srv);
+            new UserChat(srv);
             System.out.println("Connected to server on port " + port + "...");
         } catch (Exception e) {
             e.printStackTrace();
