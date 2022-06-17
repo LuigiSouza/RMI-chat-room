@@ -1,8 +1,0 @@
-./src/ChatClient.java
-./src/ChatServer.java
-./src/Room/IRoomChat.java
-./src/Room/RoomChat.java
-./src/Server/IServerChat.java
-./src/Server/ServerChat.java
-./src/User/IUserChat.java
-./src/User/UserChat.java
