@@ -10,7 +10,6 @@ import java.rmi.server.UnicastRemoteObject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 public class ServerChat extends UnicastRemoteObject implements IServerChat {
     private ArrayList<String> roomList;
