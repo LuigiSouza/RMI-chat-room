@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import Room.IRoomChat;
 import Server.IServerChat;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -29,6 +27,9 @@ import javax.swing.DefaultListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 public class UserChat extends UnicastRemoteObject implements IUserChat {
     private JFrame frame;
@@ -36,6 +37,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
     private JTextPane textPane;
     private DefaultListModel<String> roomListElement;
     private String selectedRoom;
+
+    private Style style;
 
     private IServerChat server;
     private IRoomChat room;
@@ -57,7 +60,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
     private void createUI() {
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Cliente");
+        frame.setTitle("Usuário");
 
         JPanel textFieldContainer = new JPanel();
         textFieldContainer.setLayout(new BorderLayout());
@@ -72,6 +75,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         textPane.setContentType("text");
         textPane.setText("");
         textPane.setPreferredSize(new Dimension(200, 250));
+        style = textPane.addStyle("Style", null);
 
         JLabel chatLabel = new JLabel("<html><b>Chat:</b></html>");
         chatLabel.setForeground(Color.DARK_GRAY);
@@ -86,8 +90,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         jListElement.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jListElement.setLayoutOrientation(JList.VERTICAL);
         jListElement.setVisibleRowCount(-1);
-        for (String room : roomList) {
-            roomListElement.addElement(room);
+        for (String r : roomList) {
+            roomListElement.addElement(r);
         }
 
         JLabel roomsLabel = new JLabel("<html><b>Rooms:</b></html>");
@@ -130,10 +134,12 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         });
 
         // Button Listeners
-        textField.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                textField.setText("");
-            }
+        textField.addActionListener(e -> {
+            sendMessage();
+        });
+
+        buttonSend.addActionListener(e -> {
+            sendMessage();
         });
 
         joinRoomButton.addActionListener(e -> {
@@ -152,26 +158,30 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                             JOptionPane.INFORMATION_MESSAGE);
                     if (name == null)
                         return;
+                    userName = name;
                 } while (name.isEmpty());
+
+                if (room != null)
+                    leaveRoom();
+
                 roomName = selectedRoom;
-
-                if (room != null) {
-                    room.leaveRoom(userName);
-                    textField.setEditable(false);
-                }
                 room = (IRoomChat) Naming.lookup("rmi://localhost:2020/Rooms/" + roomName);
-                room.joinRoom(userName, this);
 
+                frame.setTitle(userName + " - " + roomName);
                 textPane.setText("");
                 textField.setEditable(true);
                 textField.requestFocus();
                 jListElement.setSelectedValue(null, false);
+
+                room.joinRoom(userName, this);
             } catch (Exception err) {
                 String message = err.getCause().getMessage();
-                if (message.startsWith("REPEATEDNAME"))
+                if (message.startsWith("REPEATEDNAME")) {
                     JOptionPane.showMessageDialog(frame, "This name is already in use", "Error joining room",
                             JOptionPane.ERROR_MESSAGE);
-                else
+                    room = null;
+                    roomName = null;
+                } else
                     JOptionPane.showMessageDialog(frame, "Error joining room");
                 err.printStackTrace();
             }
@@ -190,8 +200,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                 server.createRoom(roomName);
                 roomList = server.getRooms();
                 roomListElement.clear();
-                for (String room : roomList) {
-                    roomListElement.addElement(room);
+                for (String r : roomList) {
+                    roomListElement.addElement(r);
                 }
             } catch (Exception err) {
                 String message = err.getCause().getMessage();
@@ -208,8 +218,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
             try {
                 roomList = server.getRooms();
                 roomListElement.clear();
-                for (String room : roomList) {
-                    roomListElement.addElement(room);
+                for (String r : roomList) {
+                    roomListElement.addElement(r);
                 }
             } catch (Exception err) {
                 JOptionPane.showMessageDialog(frame, "Error refreshing rooms");
@@ -222,12 +232,9 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                 return;
 
             try {
-                room.leaveRoom(userName);
-                roomName = null;
-                room = null;
+                leaveRoom();
 
-                textField.setEditable(false);
-                textPane.setText("");
+                frame.setTitle("Usuário");
             } catch (Exception err) {
                 JOptionPane.showMessageDialog(frame, "Error leaving room", "Error leaving room",
                         JOptionPane.ERROR_MESSAGE);
@@ -237,7 +244,42 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
 
     }
 
-    public void deliverMsg(String senderName, String msg) {
+    private void leaveRoom() throws RemoteException {
+        room.leaveRoom(roomName);
+        roomName = null;
+        room = null;
+        textField.setEditable(false);
+    }
 
+    private void sendMessage() {
+        if (textField.getText().length() > 0) {
+            try {
+                room.sendMsg(userName, textField.getText());
+            } catch (RemoteException e1) {
+                e1.printStackTrace();
+            }
+            textField.setText("");
+        }
+    }
+
+    private void appendToPane(String sender, String msg, Color c) {
+        StyledDocument sd = textPane.getStyledDocument();
+        StyleConstants.setForeground(style, c);
+        String text = sender == null ? msg : "<" + sender + "> " + msg;
+        try {
+            sd.insertString(sd.getLength(), text, style);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void deliverMsg(String senderName, String msg) {
+        if (msg.startsWith("ROOMINFO")) {
+            appendToPane(null, msg.substring(9) + "\n", Color.BLUE);
+        } else if (msg.startsWith("ROOMCLOSE")) {
+            appendToPane(null, msg.substring(10) + "\n", Color.RED);
+        } else if (msg.startsWith("USERMSG")) {
+            appendToPane(senderName, msg.substring(8) + "\n", Color.BLACK);
+        }
     }
 }

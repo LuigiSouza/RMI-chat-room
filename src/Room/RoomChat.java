@@ -20,16 +20,12 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
     }
 
     public void sendMsg(String usrName, String msg) {
-        if (msg == "/quit") {
-            leaveRoom(usrName);
-        } else {
-            for (Map.Entry<String, IUserChat> entry : userList.entrySet()) {
-                try {
-                    entry.getValue().deliverMsg(usrName, "USERMSG" + msg);
-                } catch (Exception e) {
-                    System.out.println("Room Error: " + e.getMessage());
-                    e.printStackTrace();
-                }
+        for (Map.Entry<String, IUserChat> entry : userList.entrySet()) {
+            try {
+                entry.getValue().deliverMsg(usrName, "USERMSG " + msg);
+            } catch (Exception e) {
+                System.out.println("Room Error: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
