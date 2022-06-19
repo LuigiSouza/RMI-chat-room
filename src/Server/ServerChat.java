@@ -89,9 +89,9 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
                 List<String> deleteValues = list.getSelectedValuesList();
                 for (String s : deleteValues) {
                     try {
-                        IRoomChat room = (IRoomChat) Naming.lookup("//localhost:2020/Salas/" + s);
+                        IRoomChat room = (IRoomChat) Naming.lookup("rmi://localhost:2020/Salas/" + s);
                         room.closeRoom();
-                        Naming.unbind("//localhost:2020/Salas/" + s);
+                        Naming.unbind("rmi://localhost:2020/Salas/" + s);
 
                         roomList.remove(s);
                         listModel.removeElement(s);
@@ -130,7 +130,7 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
             RoomChat room = new RoomChat(roomName);
 
             roomList.add(roomName);
-            Naming.rebind("//localhost:2020/Rooms/", room);
+            Naming.rebind("rmi://localhost:2020/Rooms/" + roomName, room);
             System.out.println("Criado o room " + roomName);
         } catch (Exception e) {
             System.out.println("Server Error: " + e.getMessage());
