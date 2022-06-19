@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.GridLayout;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JScrollPane;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ListSelectionModel;
 
@@ -93,11 +94,14 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         JButton joinRoomButton = new JButton("Join");
         JButton createRoomButton = new JButton("Create");
         JButton leaveRoomButton = new JButton("Leave");
+        JButton refreshRoomsButton = new JButton("Refresh");
         JPanel buttonContainer = new JPanel();
-        buttonContainer.setLayout(new FlowLayout());
+        buttonContainer.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        buttonContainer.setLayout(new GridLayout(2, 2, 3, 3));
         buttonContainer.add(joinRoomButton);
         buttonContainer.add(createRoomButton);
         buttonContainer.add(leaveRoomButton);
+        buttonContainer.add(refreshRoomsButton);
 
         JPanel roomListContainer = new JPanel();
         roomListContainer.setLayout(new BorderLayout());
