@@ -137,12 +137,15 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         });
 
         joinRoomButton.addActionListener(e -> {
+            if (selectedRoom == roomName) {
+                JOptionPane.showMessageDialog(frame, "You are already in this room");
+                return;
+            }
             if (selectedRoom == null) {
                 JOptionPane.showMessageDialog(frame, "Select a room to join");
                 return;
             }
             try {
-
                 String name;
                 do {
                     name = JOptionPane.showInputDialog(frame, "Choose a screen name:", "Screen name selection",
@@ -152,13 +155,24 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                 } while (name.isEmpty());
                 roomName = selectedRoom;
 
+                if (room != null) {
+                    room.leaveRoom(userName);
+                    textField.setEditable(false);
+                }
                 room = (IRoomChat) Naming.lookup("rmi://localhost:2020/Rooms/" + roomName);
                 room.joinRoom(userName, this);
 
+                textPane.setText("");
                 textField.setEditable(true);
                 textField.requestFocus();
                 jListElement.setSelectedValue(null, false);
             } catch (Exception err) {
+                String message = err.getCause().getMessage();
+                if (message.startsWith("REPEATEDNAME"))
+                    JOptionPane.showMessageDialog(frame, "This name is already in use", "Error joining room",
+                            JOptionPane.ERROR_MESSAGE);
+                else
+                    JOptionPane.showMessageDialog(frame, "Error joining room");
                 err.printStackTrace();
             }
         });
@@ -166,6 +180,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         createRoomButton.addActionListener(e -> {
             String roomName = JOptionPane.showInputDialog(frame, "Room name:", "Create Room",
                     JOptionPane.QUESTION_MESSAGE);
+            if (roomName == null)
+                return;
             roomName = roomName.strip();
             if (roomName.isEmpty())
                 return;
@@ -178,7 +194,12 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                     roomListElement.addElement(room);
                 }
             } catch (Exception err) {
-                System.out.println("UserChat error: " + err.getMessage());
+                String message = err.getCause().getMessage();
+                if (message.startsWith("REPEATEDNAME"))
+                    JOptionPane.showMessageDialog(frame, "This name is already in use", "Error creating room",
+                            JOptionPane.ERROR_MESSAGE);
+                else
+                    JOptionPane.showMessageDialog(frame, "Error creating room");
                 err.printStackTrace();
             }
         });
@@ -191,7 +212,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                     roomListElement.addElement(room);
                 }
             } catch (Exception err) {
-                System.out.println("UserChat error: " + err.getMessage());
+                JOptionPane.showMessageDialog(frame, "Error refreshing rooms");
                 err.printStackTrace();
             }
         });

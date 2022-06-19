@@ -118,15 +118,13 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
     }
 
     @Override
-    public void createRoom(String roomName) {
+    public void createRoom(String roomName) throws RemoteException {
+        roomName = roomName.strip();
+
+        if (roomList.contains(roomName))
+            throw new RemoteException("REPEATEDNAME Sala com o nome " + roomName + " já existe");
+
         try {
-            roomName = roomName.strip();
-
-            if (roomList.contains(roomName)) {
-                System.out.println("Sala com o nome " + roomName + " já existe");
-                return;
-            }
-
             RoomChat room = new RoomChat(roomName);
 
             roomList.add(roomName);

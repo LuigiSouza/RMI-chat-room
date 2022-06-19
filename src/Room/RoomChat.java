@@ -18,7 +18,7 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
         this.userList = new HashMap<String, IUserChat>();
         this.isOpen = true;
     }
-    
+
     public void sendMsg(String usrName, String msg) {
         if (msg == "/quit") {
             leaveRoom(usrName);
@@ -34,7 +34,10 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
         }
     }
 
-    public void joinRoom(String usrName, IUserChat user) {
+    public void joinRoom(String usrName, IUserChat user) throws RemoteException {
+        if (userList.containsKey(usrName))
+            throw new RemoteException("REPEATEDNAME User " + usrName + " already in room " + roomName);
+
         userList.put(usrName, user);
         for (Map.Entry<String, IUserChat> entry : userList.entrySet()) {
             try {
@@ -55,7 +58,7 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
                 e.printStackTrace();
             }
         }
-    
+
         userList.remove(usrName);
     }
 
@@ -68,7 +71,7 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
                 e.printStackTrace();
             }
         }
-        
+
         isOpen = false;
     }
 
