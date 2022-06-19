@@ -1,5 +1,6 @@
 package User;
 
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -26,12 +27,15 @@ import javax.swing.JScrollPane;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class UserChat extends UnicastRemoteObject implements IUserChat {
     private JFrame frame;
     private JTextField textField;
     private JTextPane textPane;
     private DefaultListModel<String> roomListElement;
+    private String selectedRoom;
 
     private IServerChat server;
     private IRoomChat room;
@@ -117,10 +121,45 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         frame.pack();
         frame.setVisible(true);
 
+        // Room List Listener
+        jListElement.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting())
+                    selectedRoom = jListElement.getSelectedValue();
+            }
+        });
+
         // Button Listeners
         textField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 textField.setText("");
+            }
+        });
+
+        joinRoomButton.addActionListener(e -> {
+            if (selectedRoom == null) {
+                JOptionPane.showMessageDialog(frame, "Select a room to join");
+                return;
+            }
+            try {
+
+                String name;
+                do {
+                    name = JOptionPane.showInputDialog(frame, "Choose a screen name:", "Screen name selection",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    if (name == null)
+                        return;
+                } while (name.isEmpty());
+                roomName = selectedRoom;
+
+                room = (IRoomChat) Naming.lookup("rmi://localhost:2020/Rooms/" + roomName);
+                room.joinRoom(userName, this);
+
+                textField.setEditable(true);
+                textField.requestFocus();
+                jListElement.setSelectedValue(null, false);
+            } catch (Exception err) {
+                err.printStackTrace();
             }
         });
 
@@ -143,6 +182,20 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                 err.printStackTrace();
             }
         });
+
+        refreshRoomsButton.addActionListener(e -> {
+            try {
+                roomList = server.getRooms();
+                roomListElement.clear();
+                for (String room : roomList) {
+                    roomListElement.addElement(room);
+                }
+            } catch (Exception err) {
+                System.out.println("UserChat error: " + err.getMessage());
+                err.printStackTrace();
+            }
+        });
+
     }
 
     public void deliverMsg(String senderName, String msg) {
