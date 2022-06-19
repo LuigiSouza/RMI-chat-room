@@ -217,6 +217,24 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
             }
         });
 
+        leaveRoomButton.addActionListener(e -> {
+            if (room == null)
+                return;
+
+            try {
+                room.leaveRoom(userName);
+                roomName = null;
+                room = null;
+
+                textField.setEditable(false);
+                textPane.setText("");
+            } catch (Exception err) {
+                JOptionPane.showMessageDialog(frame, "Error leaving room", "Error leaving room",
+                        JOptionPane.ERROR_MESSAGE);
+                err.printStackTrace();
+            }
+        });
+
     }
 
     public void deliverMsg(String senderName, String msg) {
