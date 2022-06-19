@@ -25,7 +25,7 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
         } else {
             for (Map.Entry<String, IUserChat> entry : userList.entrySet()) {
                 try {
-                    entry.getValue().deliverMsg(usrName, msg);
+                    entry.getValue().deliverMsg(usrName, "USERMSG" + msg);
                 } catch (Exception e) {
                     System.out.println("Room Error: " + e.getMessage());
                     e.printStackTrace();
@@ -41,7 +41,7 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
         userList.put(usrName, user);
         for (Map.Entry<String, IUserChat> entry : userList.entrySet()) {
             try {
-                entry.getValue().deliverMsg(usrName, "User " + usrName + " has joined the room.");
+                entry.getValue().deliverMsg(usrName, "ROOMINFO " + usrName + " has joined the room.");
             } catch (Exception e) {
                 System.out.println("Room Error: " + e.getMessage());
                 e.printStackTrace();
@@ -52,7 +52,7 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
     public void leaveRoom(String usrName) {
         for (Map.Entry<String, IUserChat> entry : userList.entrySet()) {
             try {
-                entry.getValue().deliverMsg(usrName, "User " + usrName + " left the room.");
+                entry.getValue().deliverMsg(usrName, "ROOMINFO " + usrName + " left the room.");
             } catch (Exception e) {
                 System.out.println("Room Error: " + e.getMessage());
                 e.printStackTrace();
@@ -65,7 +65,7 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
     public void closeRoom() {
         for (Map.Entry<String, IUserChat> entry : userList.entrySet()) {
             try {
-                entry.getValue().deliverMsg("Server", "Room \"" + roomName + "\" was closed by the server.");
+                entry.getValue().deliverMsg("Server", "ROOMCLOSE Room \"" + roomName + "\" was closed by the server.");
             } catch (Exception e) {
                 System.out.println("Room Error: " + e.getMessage());
                 e.printStackTrace();
