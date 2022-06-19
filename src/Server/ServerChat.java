@@ -14,7 +14,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-
 public class ServerChat extends UnicastRemoteObject implements IServerChat {
     private ArrayList<String> roomList;
 
@@ -63,7 +62,7 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
         pane.add(listScroller);
 
         // Buttons
-        btnOpen  = new JButton("Open");
+        btnOpen = new JButton("Open");
         btnClose = new JButton("Close");
         createBtnActionListeners();
 
@@ -73,12 +72,12 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
         pane.add(btnOpen, constr);
         constr.gridy = 2;
         pane.add(btnClose, constr);
-        
+
         // Counter de salas
         label = new JLabel("Total Rooms: 0");
         label.setVerticalTextPosition(JLabel.BOTTOM);
         label.setHorizontalTextPosition(JLabel.CENTER);
-        
+
         constr.gridx = 0;
         constr.gridy = 3;
         pane.add(label, constr);
@@ -88,12 +87,12 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
         btnClose.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 List<String> deleteValues = list.getSelectedValuesList();
-                for(String s : deleteValues) {
+                for (String s : deleteValues) {
                     try {
                         IRoomChat room = (IRoomChat) Naming.lookup("//localhost:2020/Salas/" + s);
                         room.closeRoom();
                         Naming.unbind("//localhost:2020/Salas/" + s);
-                        
+
                         roomList.remove(s);
                         listModel.removeElement(s);
                     } catch (Exception ex) {
@@ -121,6 +120,13 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
     @Override
     public void createRoom(String roomName) {
         try {
+            roomName = roomName.strip();
+
+            if (roomList.contains(roomName)) {
+                System.out.println("Sala com o nome " + roomName + " já existe");
+                return;
+            }
+
             RoomChat room = new RoomChat(roomName);
 
             roomList.add(roomName);

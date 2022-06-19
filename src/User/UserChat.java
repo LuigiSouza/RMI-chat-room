@@ -18,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
@@ -56,11 +57,11 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
 
         JPanel textFieldContainer = new JPanel();
         textFieldContainer.setLayout(new BorderLayout());
-        JButton btnSend = new JButton("Send");
+        JButton buttonSend = new JButton("Send");
         textField = new JTextField(50);
-        textField.setEditable(true);
+        textField.setEditable(false);
         textFieldContainer.add(textField, BorderLayout.WEST);
-        textFieldContainer.add(btnSend, BorderLayout.EAST);
+        textFieldContainer.add(buttonSend, BorderLayout.EAST);
 
         textPane = new JTextPane();
         textPane.setEditable(false);
@@ -116,10 +117,30 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         frame.pack();
         frame.setVisible(true);
 
-        // Send on enter then clear to prepare for next message
+        // Button Listeners
         textField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 textField.setText("");
+            }
+        });
+
+        createRoomButton.addActionListener(e -> {
+            String roomName = JOptionPane.showInputDialog(frame, "Room name:", "Create Room",
+                    JOptionPane.QUESTION_MESSAGE);
+            roomName = roomName.strip();
+            if (roomName.isEmpty())
+                return;
+
+            try {
+                server.createRoom(roomName);
+                roomList = server.getRooms();
+                roomListElement.clear();
+                for (String room : roomList) {
+                    roomListElement.addElement(room);
+                }
+            } catch (Exception err) {
+                System.out.println("UserChat error: " + err.getMessage());
+                err.printStackTrace();
             }
         });
     }
