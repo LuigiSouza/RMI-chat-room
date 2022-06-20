@@ -84,17 +84,18 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
     }
 
     private void createBtnActionListeners() {
+        // Fechar as salas
         btnClose.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 List<String> deleteValues = list.getSelectedValuesList();
                 for (String s : deleteValues) {
                     try {
                         IRoomChat room = (IRoomChat) Naming.lookup("rmi://localhost:2020/Rooms/" + s);
-                        room.closeRoom();
-                        Naming.unbind("rmi://localhost:2020/Rooms/" + s);
-
                         roomList.remove(s);
+                        room.closeRoom();
+
                         listModel.removeElement(s);
+                        label.setText("Total Rooms: " + listModel.size());
                     } catch (Exception ex) {
                         System.out.println("Server error: " + ex.getMessage());
                         ex.printStackTrace();
@@ -103,6 +104,7 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
             }
         });
 
+        // Criar nova sala
         btnOpen.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String roomName = JOptionPane.showInputDialog(frame, "Room name:", "Create Room",

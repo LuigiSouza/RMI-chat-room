@@ -215,18 +215,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
             }
         });
 
-        refreshRoomsButton.addActionListener(e -> {
-            try {
-                roomList = server.getRooms();
-                roomListElement.clear();
-                for (String r : roomList) {
-                    roomListElement.addElement(r);
-                }
-            } catch (Exception err) {
-                JOptionPane.showMessageDialog(frame, "Error refreshing rooms");
-                err.printStackTrace();
-            }
-        });
+        refreshRoomsButton.addActionListener(e -> { refreshRooms(); });
 
         leaveRoomButton.addActionListener(e -> {
             if (room == null)
@@ -245,7 +234,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
 
     }
 
-    private void leaveRoom() throws RemoteException {
+    public void leaveRoom() throws RemoteException {
         room.leaveRoom(userName);
         userName = null;
         roomName = null;
@@ -273,6 +262,20 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
             sd.insertString(sd.getLength(), text, style);
         } catch (Exception e) {
             System.out.println(e);
+        }
+    }
+
+    public void refreshRooms() {
+        try {
+            roomList = server.getRooms();
+            roomListElement.clear();
+            
+            for (String r : roomList) {
+                roomListElement.addElement(r);
+            }
+        } catch (Exception err) {
+            JOptionPane.showMessageDialog(frame, "Error refreshing rooms");
+            err.printStackTrace();
         }
     }
 

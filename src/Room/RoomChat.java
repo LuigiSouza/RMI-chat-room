@@ -1,5 +1,6 @@
 package Room;
 
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
@@ -61,7 +62,11 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
     public void closeRoom() {
         for (Map.Entry<String, IUserChat> entry : userList.entrySet()) {
             try {
-                entry.getValue().deliverMsg("Server", "ROOMCLOSE Room \"" + roomName + "\" was closed by the server.");
+                IUserChat usr = entry.getValue();          
+                usr.deliverMsg("Server", "ROOMCLOSE Room \"" + roomName + "\" was closed by the server.");
+                usr.leaveRoom();
+                Naming.unbind("rmi://localhost:2020/Rooms/" + roomName);
+                usr.refreshRooms();
             } catch (Exception e) {
                 System.out.println("Room Error: " + e.getMessage());
                 e.printStackTrace();
