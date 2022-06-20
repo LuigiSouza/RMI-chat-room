@@ -47,7 +47,7 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(-1);
-
+        
         GridBagConstraints constr = new GridBagConstraints();
         constr.fill = GridBagConstraints.HORIZONTAL;
         constr.gridwidth = 3;
@@ -89,12 +89,13 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
                 List<String> deleteValues = list.getSelectedValuesList();
                 for (String s : deleteValues) {
                     try {
-                        IRoomChat room = (IRoomChat) Naming.lookup("rmi://localhost:2020/Salas/" + s);
+                        IRoomChat room = (IRoomChat) Naming.lookup("rmi://localhost:2020/Rooms/" + s);
                         room.closeRoom();
-                        Naming.unbind("rmi://localhost:2020/Salas/" + s);
+                        Naming.unbind("rmi://localhost:2020/Rooms/" + s);
 
                         roomList.remove(s);
                         listModel.removeElement(s);
+                        list.setModel(listModel);
                     } catch (Exception ex) {
                         System.out.println("Server error: " + ex.getMessage());
                         ex.printStackTrace();
@@ -106,18 +107,21 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
         btnOpen.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String newRoomName = "Teste";
-                // createRoom();
+                try {
+                    createRoom(newRoomName);
+                } catch (Exception ex) {
+                    System.out.println("Server error: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
             }
         });
     }
 
-    @Override
     public ArrayList<String> getRooms() {
         System.out.println("Buscado a lista de salas");
         return roomList;
     }
 
-    @Override
     public void createRoom(String roomName) throws RemoteException {
         roomName = roomName.strip();
 
@@ -126,10 +130,13 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
 
         try {
             RoomChat room = new RoomChat(roomName);
-
             roomList.add(roomName);
+            listModel.addElement(roomName);
+            list.setModel(listModel);
+            
             Naming.rebind("rmi://localhost:2020/Rooms/" + roomName, room);
-            System.out.println("Criado o room " + roomName);
+            System.out.println("Room " + roomName + " created");
+            label.setText("Total Rooms: " + listModel.size());
         } catch (Exception e) {
             System.out.println("Server Error: " + e.getMessage());
             e.printStackTrace();
