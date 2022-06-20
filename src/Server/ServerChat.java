@@ -19,7 +19,6 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
 
     // Swing Variables
     private JFrame frame;
-    private JPanel panel;
     private JButton btnClose, btnOpen;
     private JLabel label;
     private JList<String> list;
