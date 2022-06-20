@@ -106,9 +106,19 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
 
         btnOpen.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String newRoomName = "Teste";
+                String roomName = JOptionPane.showInputDialog(frame, "Room name:", "Create Room",
+                    JOptionPane.QUESTION_MESSAGE);
+                
+                if (roomName == null)
+                    return;
+                
+                roomName = roomName.strip();
+                
+                if (roomName.isEmpty())
+                    return;
+
                 try {
-                    createRoom(newRoomName);
+                    createRoom(roomName);
                 } catch (Exception ex) {
                     System.out.println("Server error: " + ex.getMessage());
                     ex.printStackTrace();
