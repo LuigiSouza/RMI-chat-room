@@ -245,7 +245,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
     }
 
     private void leaveRoom() throws RemoteException {
-        room.leaveRoom(roomName);
+        room.leaveRoom(userName);
+        userName = null;
         roomName = null;
         room = null;
         textField.setEditable(false);
