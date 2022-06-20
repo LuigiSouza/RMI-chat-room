@@ -46,6 +46,7 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(-1);
+        list.setModel(listModel);
         
         GridBagConstraints constr = new GridBagConstraints();
         constr.fill = GridBagConstraints.HORIZONTAL;
@@ -94,7 +95,6 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
 
                         roomList.remove(s);
                         listModel.removeElement(s);
-                        list.setModel(listModel);
                     } catch (Exception ex) {
                         System.out.println("Server error: " + ex.getMessage());
                         ex.printStackTrace();
@@ -141,7 +141,6 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
             RoomChat room = new RoomChat(roomName);
             roomList.add(roomName);
             listModel.addElement(roomName);
-            list.setModel(listModel);
             
             Naming.rebind("rmi://localhost:2020/Rooms/" + roomName, room);
             System.out.println("Room " + roomName + " created");
