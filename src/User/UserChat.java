@@ -161,7 +161,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                 return;
             }
 
-            if (selectedRoom == roomName) {
+            if (selectedRoom.equals(roomName)) {
                 JOptionPane.showMessageDialog(frame, "You are already in this room");
                 return;
             }
@@ -249,7 +249,6 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         room.leaveRoom(userName);
         userName = null;
         roomName = null;
-        selectedRoom = null;
         room = null;
         textField.setEditable(false);
     }
