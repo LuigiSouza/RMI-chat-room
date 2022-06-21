@@ -89,21 +89,29 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
 
     private void createBtnActionListeners() {
         // Fechar as salas
-        btnClose.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                List<String> deleteValues = list.getSelectedValuesList();
-                for (String s : deleteValues) {
-                    try {
-                        IRoomChat room = (IRoomChat) Naming.lookup("rmi://" + getSocketValue() + "/Rooms/" + s);
-                        roomList.remove(s);
-                        room.closeRoom();
-                        Naming.unbind("rmi://" + getSocketValue() + "/Rooms/" + s);
+        btnClose.addActionListener(e -> {
+            List<String> deleteValues = list.getSelectedValuesList();
+            for (String s : deleteValues) {
+                try {
+                    IRoomChat room = (IRoomChat) Naming.lookup("rmi://" + getSocketValue() + "/Rooms/" + s);
+                    roomList.remove(s);
+                    room.closeRoom();
+                    Naming.unbind("rmi://" + getSocketValue() + "/Rooms/" + s);
 
-                        listModel.removeElement(s);
-                        label.setText("Total Rooms: " + listModel.size());
-                    } catch (Exception err) {
-                        System.out.println("Server error: " + err.getMessage());
-                    }
+                    listModel.removeElement(s);
+                    label.setText("Total Rooms: " + listModel.size());
+                    System.out.println("Room " + s + " closed");
+
+                } catch (Exception err) {
+                    System.out.println("Server error: " + err.getMessage());
+                }
+            }
+            for (String roomName : roomList) {
+                try {
+                    IRoomChat room = (IRoomChat) Naming.lookup("rmi://" + getSocketValue() + "/Rooms/" + roomName);
+                    room.refreshUsers();
+                } catch (Exception err) {
+                    System.out.println("Server error: " + err.getMessage());
                 }
             }
         });

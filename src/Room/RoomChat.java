@@ -71,6 +71,17 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
         }
     }
 
+    public void refreshUsers() {
+        for (Map.Entry<String, IUserChat> key : userList.entrySet()) {
+            try {
+                IUserChat usr = key.getValue();
+                usr.refreshRooms();
+            } catch (Exception e) {
+                System.out.println("Room Error: " + e.getMessage());
+            }
+        }
+    }
+
     public String getRoomName() {
         return roomName;
     }
