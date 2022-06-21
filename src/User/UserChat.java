@@ -295,6 +295,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         } else if (msg.startsWith("ROOMCLOSE")) {
             appendToPane(null, msg.substring(10) + "\n", Color.RED);
             leaveRoom();
+            refreshRooms();
         } else if (msg.startsWith("USERMSG")) {
             appendToPane(senderName, msg.substring(8) + "\n", Color.BLACK);
         }
