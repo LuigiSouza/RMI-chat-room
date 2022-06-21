@@ -165,6 +165,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                 JOptionPane.showMessageDialog(frame, "You are already in this room");
                 return;
             }
+
             try {
                 String name;
                 do {
@@ -177,9 +178,9 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
 
                 if (room != null)
                     leaveRoom();
-
-                room = (IRoomChat) Naming.lookup("rmi://" + server.getSocketValue() + "/Rooms/" + roomName);
+                
                 roomName = selectedRoom;
+                room = (IRoomChat) Naming.lookup("rmi://" + server.getSocketValue() + "/Rooms/" + roomName);
 
                 frame.setTitle(userName + " - " + roomName);
                 textPane.setText("");
