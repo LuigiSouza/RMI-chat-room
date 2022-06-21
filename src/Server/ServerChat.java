@@ -3,16 +3,26 @@ package Server;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+
 import Room.IRoomChat;
 import Room.RoomChat;
 
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
 
 public class ServerChat extends UnicastRemoteObject implements IServerChat {
     private ArrayList<String> roomList;
@@ -41,8 +51,6 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
     }
 
     private void createContentPane() {
-        Container pane = frame.getContentPane();
-        pane.setLayout(new GridBagLayout());
 
         listModel = new DefaultListModel<String>();
 
@@ -51,83 +59,69 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
         list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(-1);
         list.setModel(listModel);
-
-        GridBagConstraints constr = new GridBagConstraints();
-        constr.fill = GridBagConstraints.HORIZONTAL;
-        constr.gridwidth = 3;
-        constr.gridx = 0;
-        constr.gridy = 0;
-
-        pane.add(list, constr);
-
         listScroller = new JScrollPane(list);
         listScroller.setPreferredSize(new Dimension(300, 200));
 
-        pane.add(listScroller);
+        frame.getContentPane().add(listScroller, BorderLayout.NORTH);
 
         // Buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(2, 1, 0, 3));
         btnOpen = new JButton("Open");
+        btnOpen.setSize(300, 200);
         btnClose = new JButton("Close");
+        buttonPanel.add(btnOpen);
+        buttonPanel.add(btnClose);
         createBtnActionListeners();
 
-        constr.fill = GridBagConstraints.HORIZONTAL;
-        constr.gridx = 0;
-        constr.gridy = 1;
-        pane.add(btnOpen, constr);
-        constr.gridy = 2;
-        pane.add(btnClose, constr);
+        frame.getContentPane().add(buttonPanel, BorderLayout.CENTER);
 
         // Counter de salas
         label = new JLabel("Total Rooms: 0");
         label.setVerticalTextPosition(JLabel.BOTTOM);
         label.setHorizontalTextPosition(JLabel.CENTER);
 
-        constr.gridx = 0;
-        constr.gridy = 3;
-        pane.add(label, constr);
+        frame.getContentPane().add(label, BorderLayout.SOUTH);
+
     }
 
     private void createBtnActionListeners() {
         // Fechar as salas
-        btnClose.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                List<String> deleteValues = list.getSelectedValuesList();
-                for (String s : deleteValues) {
-                    try {
-                        IRoomChat room = (IRoomChat) Naming.lookup("rmi://" + getSocketValue() + "/Rooms/" + s);
-                        roomList.remove(s);
-                        room.closeRoom();
-                        Naming.unbind("rmi://" + getSocketValue() + "/Rooms/" + s);
+        btnClose.addActionListener(e -> {
+            List<String> deleteValues = list.getSelectedValuesList();
+            for (String s : deleteValues) {
+                try {
+                    IRoomChat room = (IRoomChat) Naming.lookup("rmi://" + getSocketValue() + "/Rooms/" + s);
+                    roomList.remove(s);
+                    room.closeRoom();
+                    Naming.unbind("rmi://" + getSocketValue() + "/Rooms/" + s);
 
-                        listModel.removeElement(s);
-                        label.setText("Total Rooms: " + listModel.size());
-                        System.out.println("Room " + s + " closed");
-                    } catch (Exception err) {
-                        System.out.println("Server error: " + err.getMessage());
-                    }
+                    listModel.removeElement(s);
+                    label.setText("Total Rooms: " + listModel.size());
+                    System.out.println("Room " + s + " closed");
+                } catch (Exception err) {
+                    System.out.println("Server error: " + err.getMessage());
                 }
             }
         });
 
         // Criar nova sala
-        btnOpen.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String roomName = JOptionPane.showInputDialog(frame, "Room name:", "Create Room",
-                        JOptionPane.QUESTION_MESSAGE);
+        btnOpen.addActionListener(e -> {
+            String roomName = JOptionPane.showInputDialog(frame, "Room name:", "Create Room",
+                    JOptionPane.QUESTION_MESSAGE);
 
-                if (roomName == null)
-                    return;
+            if (roomName == null)
+                return;
 
-                roomName = roomName.strip();
+            roomName = roomName.strip();
 
-                if (roomName.isEmpty())
-                    return;
+            if (roomName.isEmpty())
+                return;
 
-                try {
-                    createRoom(roomName);
-                } catch (Exception err) {
-                    System.out.println("Server error: " + err.getMessage());
-                }
+            try {
+                createRoom(roomName);
+            } catch (Exception err) {
+                System.out.println("Server error: " + err.getMessage());
             }
         });
     }
