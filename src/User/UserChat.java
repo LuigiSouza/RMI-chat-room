@@ -12,6 +12,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowAdapter;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -54,7 +56,19 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         room = null;
         roomName = "";
 
+        
         this.createUI();
+        
+        frame.addWindowListener( new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                try {
+                    if (roomName != "")
+                        leaveRoom();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+       });
     }
 
     private void createUI() {
@@ -199,11 +213,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
 
             try {
                 server.createRoom(roomName);
-                roomList = server.getRooms();
-                roomListElement.clear();
-                for (String r : roomList) {
-                    roomListElement.addElement(r);
-                }
+                refreshRooms();
             } catch (Exception err) {
                 String message = err.getCause().getMessage();
                 if (message.startsWith("REPEATEDNAME"))
