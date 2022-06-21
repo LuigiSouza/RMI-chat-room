@@ -25,7 +25,6 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
                 entry.getValue().deliverMsg(usrName, "USERMSG " + msg);
             } catch (Exception e) {
                 System.out.println("Room Error: " + e.getMessage());
-                e.printStackTrace();
             }
         }
     }
@@ -40,7 +39,6 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
                 entry.getValue().deliverMsg(usrName, "ROOMINFO " + usrName + " has joined the room.");
             } catch (Exception e) {
                 System.out.println("Room Error: " + e.getMessage());
-                e.printStackTrace();
             }
         }
     }
@@ -54,7 +52,6 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
                 entry.getValue().deliverMsg(usrName, "ROOMINFO " + usrName + " left the room.");
             } catch (Exception e) {
                 System.out.println("Room Error: " + e.getMessage());
-                e.printStackTrace();
             }
         }
 
@@ -70,7 +67,6 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
                 userList.remove(key);
             } catch (Exception e) {
                 System.out.println("Room Error: " + e.getMessage());
-                e.printStackTrace();
             }
             System.out.println(keys);
         }

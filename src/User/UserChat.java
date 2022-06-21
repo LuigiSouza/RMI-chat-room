@@ -63,8 +63,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                 try {
                     if (roomName != "")
                         leaveRoom();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (Exception err) {
+                    System.out.println("Client error: " + err.getMessage());
                 }
             }
         });
@@ -73,7 +73,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
     private void createUI() {
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Usuário");
+        frame.setTitle("User");
 
         JPanel textFieldContainer = new JPanel();
         textFieldContainer.setLayout(new BorderLayout());
@@ -197,7 +197,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                     roomName = null;
                 } else
                     JOptionPane.showMessageDialog(frame, "Error joining room");
-                err.printStackTrace();
+                System.out.println("Client error: " + err.getMessage());
             }
         });
 
@@ -220,7 +220,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                             JOptionPane.ERROR_MESSAGE);
                 else
                     JOptionPane.showMessageDialog(frame, "Error creating room");
-                err.printStackTrace();
+                System.out.println("Client error: " + err.getMessage());
             }
         });
 
@@ -235,11 +235,11 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
             try {
                 leaveRoom();
 
-                frame.setTitle("Usuário");
+                frame.setTitle("User");
             } catch (Exception err) {
                 JOptionPane.showMessageDialog(frame, "Error leaving room", "Error leaving room",
                         JOptionPane.ERROR_MESSAGE);
-                err.printStackTrace();
+                System.out.println("Client error: " + err.getMessage());
             }
         });
 
@@ -259,7 +259,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
             try {
                 room.sendMsg(userName, textField.getText());
             } catch (RemoteException e) {
-                e.printStackTrace();
+                System.out.println("Client error: " + e.getMessage());
             }
             textField.setText("");
         }
@@ -286,7 +286,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
             }
         } catch (Exception err) {
             JOptionPane.showMessageDialog(frame, "Error refreshing rooms");
-            err.printStackTrace();
+            System.out.println("Client error: " + err.getMessage());
         }
     }
 

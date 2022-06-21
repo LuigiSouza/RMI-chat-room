@@ -101,9 +101,8 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
 
                         listModel.removeElement(s);
                         label.setText("Total Rooms: " + listModel.size());
-                    } catch (Exception ex) {
-                        System.out.println("Server error: " + ex.getMessage());
-                        ex.printStackTrace();
+                    } catch (Exception err) {
+                        System.out.println("Server error: " + err.getMessage());
                     }
                 }
             }
@@ -125,9 +124,8 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
 
                 try {
                     createRoom(roomName);
-                } catch (Exception ex) {
-                    System.out.println("Server error: " + ex.getMessage());
-                    ex.printStackTrace();
+                } catch (Exception err) {
+                    System.out.println("Server error: " + err.getMessage());
                 }
             }
         });
@@ -142,7 +140,7 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
         roomName = roomName.strip();
 
         if (roomList.contains(roomName))
-            throw new RemoteException("REPEATEDNAME Sala com o nome " + roomName + " já existe");
+            throw new RemoteException("REPEATEDNAME Room name already exists");
 
         try {
             RoomChat room = new RoomChat(roomName);
@@ -154,7 +152,6 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
             label.setText("Total Rooms: " + listModel.size());
         } catch (Exception e) {
             System.out.println("Server Error: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
