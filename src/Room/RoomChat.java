@@ -68,7 +68,6 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
             } catch (Exception e) {
                 System.out.println("Room Error: " + e.getMessage());
             }
-            System.out.println(keys);
         }
     }
 
