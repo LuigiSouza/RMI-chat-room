@@ -178,8 +178,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                 if (room != null)
                     leaveRoom();
 
-                roomName = selectedRoom;
                 room = (IRoomChat) Naming.lookup("rmi://" + server.getSocketValue() + "/Rooms/" + roomName);
+                roomName = selectedRoom;
 
                 frame.setTitle(userName + " - " + roomName);
                 textPane.setText("");
@@ -189,7 +189,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
 
                 room.joinRoom(userName, this);
             } catch (Exception err) {
-                String message = err.getCause().getMessage();
+                refreshRooms();
+                String message = err.getMessage();
                 if (message.startsWith("REPEATEDNAME")) {
                     JOptionPane.showMessageDialog(frame, "This name is already in use", "Error joining room",
                             JOptionPane.ERROR_MESSAGE);

@@ -101,6 +101,7 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
 
                         listModel.removeElement(s);
                         label.setText("Total Rooms: " + listModel.size());
+                        System.out.println("Room " + s + " closed");
                     } catch (Exception err) {
                         System.out.println("Server error: " + err.getMessage());
                     }
