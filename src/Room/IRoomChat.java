@@ -10,5 +10,4 @@ public interface IRoomChat extends Remote {
     public void leaveRoom(String usrName) throws RemoteException;
     public void closeRoom() throws RemoteException;
     public String getRoomName() throws RemoteException;
-    public void refreshUsers() throws RemoteException;
 }
