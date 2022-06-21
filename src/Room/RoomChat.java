@@ -12,13 +12,11 @@ import User.IUserChat;
 public class RoomChat extends UnicastRemoteObject implements IRoomChat {
     private String roomName;
     private Map<String, IUserChat> userList;
-    boolean isOpen;
 
     public RoomChat(String roomName) throws RemoteException {
         super();
         this.roomName = roomName;
         this.userList = new HashMap<String, IUserChat>();
-        this.isOpen = true;
     }
 
     public void sendMsg(String usrName, String msg) {
@@ -76,8 +74,6 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
             }
             System.out.println(keys);
         }
-
-        isOpen = false;
     }
 
     public String getRoomName() {
