@@ -16,6 +16,8 @@ import java.awt.event.*;
 
 public class ServerChat extends UnicastRemoteObject implements IServerChat {
     private ArrayList<String> roomList;
+    private String ipAddress;
+    private int port;
 
     // Swing Variables
     private JFrame frame;
@@ -25,8 +27,10 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
     private DefaultListModel<String> listModel;
     private JScrollPane listScroller;
 
-    public ServerChat() throws RemoteException {
+    public ServerChat(String ipAddress, int port) throws RemoteException {
         roomList = new ArrayList<String>();
+        this.ipAddress = ipAddress;
+        this.port = port;
 
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -90,9 +94,10 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
                 List<String> deleteValues = list.getSelectedValuesList();
                 for (String s : deleteValues) {
                     try {
-                        IRoomChat room = (IRoomChat) Naming.lookup("rmi://localhost:2020/Rooms/" + s);
+                        IRoomChat room = (IRoomChat) Naming.lookup("rmi://" + getSocketValue() + "/Rooms/" + s);
                         roomList.remove(s);
                         room.closeRoom();
+                        Naming.unbind("rmi://" + getSocketValue() + "/Rooms/" + s);
 
                         listModel.removeElement(s);
                         label.setText("Total Rooms: " + listModel.size());
@@ -144,7 +149,7 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
             roomList.add(roomName);
             listModel.addElement(roomName);
             
-            Naming.rebind("rmi://localhost:2020/Rooms/" + roomName, room);
+            Naming.rebind("rmi://" + getSocketValue() + "/Rooms/" + roomName, room);
             System.out.println("Room " + roomName + " created");
             label.setText("Total Rooms: " + listModel.size());
         } catch (Exception e) {
@@ -152,4 +157,6 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
             e.printStackTrace();
         }
     }
+
+    public String getSocketValue() { return (ipAddress + ":" + port); }
 }

@@ -180,7 +180,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                     leaveRoom();
 
                 roomName = selectedRoom;
-                room = (IRoomChat) Naming.lookup("rmi://localhost:2020/Rooms/" + roomName);
+                room = (IRoomChat) Naming.lookup("rmi://" + server.getSocketValue() + "/Rooms/" + roomName);
 
                 frame.setTitle(userName + " - " + roomName);
                 textPane.setText("");
@@ -257,8 +257,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         if (textField.getText().length() > 0) {
             try {
                 room.sendMsg(userName, textField.getText());
-            } catch (RemoteException e1) {
-                e1.printStackTrace();
+            } catch (RemoteException e) {
+                e.printStackTrace();
             }
             textField.setText("");
         }
