@@ -65,7 +65,6 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
                 IUserChat usr = entry.getValue();          
                 usr.deliverMsg("Server", "ROOMCLOSE Room \"" + roomName + "\" was closed by the server.");
                 usr.leaveRoom();
-                Naming.unbind("rmi://localhost:2020/Rooms/" + roomName);
                 usr.refreshRooms();
             } catch (Exception e) {
                 System.out.println("Room Error: " + e.getMessage());
