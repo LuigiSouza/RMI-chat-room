@@ -51,7 +51,7 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
         list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(-1);
         list.setModel(listModel);
-        
+
         GridBagConstraints constr = new GridBagConstraints();
         constr.fill = GridBagConstraints.HORIZONTAL;
         constr.gridwidth = 3;
@@ -113,13 +113,13 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
         btnOpen.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String roomName = JOptionPane.showInputDialog(frame, "Room name:", "Create Room",
-                    JOptionPane.QUESTION_MESSAGE);
-                
+                        JOptionPane.QUESTION_MESSAGE);
+
                 if (roomName == null)
                     return;
-                
+
                 roomName = roomName.strip();
-                
+
                 if (roomName.isEmpty())
                     return;
 
@@ -148,7 +148,7 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
             RoomChat room = new RoomChat(roomName);
             roomList.add(roomName);
             listModel.addElement(roomName);
-            
+
             Naming.rebind("rmi://" + getSocketValue() + "/Rooms/" + roomName, room);
             System.out.println("Room " + roomName + " created");
             label.setText("Total Rooms: " + listModel.size());
@@ -158,5 +158,7 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
         }
     }
 
-    public String getSocketValue() { return (ipAddress + ":" + port); }
+    public String getSocketValue() {
+        return (ipAddress + ":" + port);
+    }
 }

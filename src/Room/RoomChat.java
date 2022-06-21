@@ -3,7 +3,9 @@ package Room;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
+import java.util.Set;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import User.IUserChat;
 
@@ -46,6 +48,9 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
     }
 
     public void leaveRoom(String usrName) {
+        if (!userList.containsKey(usrName))
+            return;
+
         for (Map.Entry<String, IUserChat> entry : userList.entrySet()) {
             try {
                 entry.getValue().deliverMsg(usrName, "ROOMINFO " + usrName + " left the room.");
@@ -59,16 +64,17 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
     }
 
     public void closeRoom() {
-        for (Map.Entry<String, IUserChat> entry : userList.entrySet()) {
+        Set<String> keys = new HashSet<String>(userList.keySet());
+        for (String key : keys) {
             try {
-                IUserChat usr = entry.getValue();          
+                IUserChat usr = userList.get(key);
                 usr.deliverMsg("Server", "ROOMCLOSE Room \"" + roomName + "\" was closed by the server.");
-                usr.leaveRoom();
-                usr.refreshRooms();
+                userList.remove(key);
             } catch (Exception e) {
                 System.out.println("Room Error: " + e.getMessage());
                 e.printStackTrace();
             }
+            System.out.println(keys);
         }
 
         isOpen = false;

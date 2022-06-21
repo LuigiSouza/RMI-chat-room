@@ -56,10 +56,9 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         room = null;
         roomName = "";
 
-        
         this.createUI();
-        
-        frame.addWindowListener( new WindowAdapter() {
+
+        frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 try {
                     if (roomName != "")
@@ -68,7 +67,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                     ex.printStackTrace();
                 }
             }
-       });
+        });
     }
 
     private void createUI() {
@@ -161,7 +160,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                 JOptionPane.showMessageDialog(frame, "Select a room to join");
                 return;
             }
-            
+
             if (selectedRoom == roomName) {
                 JOptionPane.showMessageDialog(frame, "You are already in this room");
                 return;
@@ -225,7 +224,9 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
             }
         });
 
-        refreshRoomsButton.addActionListener(e -> { refreshRooms(); });
+        refreshRoomsButton.addActionListener(e -> {
+            refreshRooms();
+        });
 
         leaveRoomButton.addActionListener(e -> {
             if (room == null)
@@ -244,7 +245,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
 
     }
 
-    public void leaveRoom() throws RemoteException {
+    private void leaveRoom() throws RemoteException {
         room.leaveRoom(userName);
         userName = null;
         roomName = null;
@@ -279,7 +280,7 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         try {
             roomList = server.getRooms();
             roomListElement.clear();
-            
+
             for (String r : roomList) {
                 roomListElement.addElement(r);
             }
@@ -289,11 +290,12 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         }
     }
 
-    public void deliverMsg(String senderName, String msg) {
+    public void deliverMsg(String senderName, String msg) throws RemoteException {
         if (msg.startsWith("ROOMINFO")) {
             appendToPane(null, msg.substring(9) + "\n", Color.BLUE);
         } else if (msg.startsWith("ROOMCLOSE")) {
             appendToPane(null, msg.substring(10) + "\n", Color.RED);
+            leaveRoom();
         } else if (msg.startsWith("USERMSG")) {
             appendToPane(senderName, msg.substring(8) + "\n", Color.BLACK);
         }
