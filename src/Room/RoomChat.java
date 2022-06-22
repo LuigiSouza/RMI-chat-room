@@ -19,6 +19,7 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
         this.userList = new HashMap<String, IUserChat>();
     }
 
+    // mensagens aos membros da sala.
     public void sendMsg(String usrName, String msg) {
         for (Map.Entry<String, IUserChat> entry : userList.entrySet()) {
             try {
