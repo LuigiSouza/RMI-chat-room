@@ -19,6 +19,7 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
         this.userList = new HashMap<String, IUserChat>();
     }
 
+    // RFA11: O controlador da sala (sala) é quem deve controlar o envio das 
     // mensagens aos membros da sala.
     public void sendMsg(String usrName, String msg) {
         for (Map.Entry<String, IUserChat> entry : userList.entrySet()) {
@@ -64,6 +65,8 @@ public class RoomChat extends UnicastRemoteObject implements IRoomChat {
         for (String key : keys) {
             try {
                 IUserChat usr = userList.get(key);
+                // RFA13: Caso haja usuários na sala, antes de ser finalizado o controlador da sala
+                // deve enviar uma mensagem “Sala fechada pelo servidor.” aos usuários.
                 usr.deliverMsg("Server", "ROOMCLOSE Room \"" + roomName + "\" was closed by the server.");
                 userList.remove(key);
             } catch (Exception e) {

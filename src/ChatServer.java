@@ -14,6 +14,10 @@ public class ChatServer {
             String objName = "rmi://" + addr + ":" + port + "/Server";
 
             System.out.println("Registering server...");
+            
+            // RFA16: O servidor deve ser registrado no registro de RMI (rmiregistry) 
+            // com o nome “Servidor” e usar a porta “2020” para escutar clientes. 
+            // O registro deve executar na máquina do servidor.
             LocateRegistry.createRegistry(port).rebind("Server", srv);
             Naming.rebind(objName, srv);
             System.out.println("Server is running on address " + addr + ":" + port + "...");
