@@ -52,12 +52,15 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         super();
 
         this.server = server;
+        // RFA4: No início, todo cliente, identificado pelo seu nome (usrName), deve contatar
+        // o servidor e solicitar a lista de salas roomList.
         roomList = server.getRooms();
         room = null;
         roomName = "";
 
         this.createUI();
 
+        // Listener para window close
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 try {
@@ -98,6 +101,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         chatContainer.add(new JScrollPane(textPane), BorderLayout.CENTER);
         chatContainer.add(chatLabel, BorderLayout.NORTH);
 
+        // RFA6: A lista de salas deve ser exibida na interface do usuário (GUI), 
+        // para permitir a escolha da sala.
         roomListElement = new DefaultListModel<String>();
         JList<String> jListElement = new JList<String>(roomListElement);
         jListElement.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -175,11 +180,14 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                         return;
                 } while (name.isEmpty());
 
-                if (roomName != "" && roomName != selectedRoom)
+                if (!roomName.isEmpty() && !roomName.equals(selectedRoom))
                     leaveRoom();
                 
                 userName = name;
                 roomName = selectedRoom;
+                
+                // RFA7: Sempre que um usuário desejar entrar numa sala já existente ele deve 
+                // solicitar a referência ao objeto remoto ao RMI Registry usando o nome da sala.
                 room = (IRoomChat) Naming.lookup("rmi://" + server.getSocketValue() + "/Rooms/" + roomName);
 
                 frame.setTitle(userName + " - " + roomName);
@@ -188,6 +196,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
                 textField.requestFocus();
                 jListElement.setSelectedValue(null, false);
 
+                // RFA7: após conhecer o objeto, deve invocar o método remoto 
+                // joinRoom(String usrName) da respectiva sala.
                 room.joinRoom(userName, this);
             } catch (Exception err) {
                 refreshRooms();
@@ -206,12 +216,17 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
             }
         });
 
+
+        // RFA8: Caso o usuário não encontre no servidor a sala desejada ele 
+        // deve poder solicitar a criação de uma nova sala.
         createRoomButton.addActionListener(e -> {
             String roomName = JOptionPane.showInputDialog(frame, "Room name:", "Create Room",
                     JOptionPane.QUESTION_MESSAGE);
             if (roomName == null)
                 return;
+            
             roomName = roomName.strip();
+            
             if (roomName.isEmpty())
                 return;
 
@@ -261,6 +276,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
     private void sendMessage() {
         if (textField.getText().length() > 0) {
             try {
+                // RFA9: Após pertencer a uma sala, o usuário deve enviar mensagens de texto à 
+                // sala através da invocação ao método remoto sendMsg(String usrName, String msg) da sala.
                 room.sendMsg(userName, textField.getText());
             } catch (RemoteException e) {
                 System.out.println("Client error: " + e.getMessage());
@@ -294,6 +311,8 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
         }
     }
 
+    // RFA10: Para receber mensagens, o processo do usuário deve implementar 
+    // um método remoto deliverMsg(String senderName, String msg).
     public void deliverMsg(String senderName, String msg) throws RemoteException {
         if (msg.startsWith("ROOMINFO")) {
             appendToPane(null, msg.substring(9) + "\n", Color.BLUE);

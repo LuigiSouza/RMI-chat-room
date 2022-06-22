@@ -25,6 +25,8 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 public class ServerChat extends UnicastRemoteObject implements IServerChat {
+    // RFA1: O servidor central deve manter uma lista de salas (roomList). A lista de salas deve
+    // declarada como private arrayList<String> roomList.
     private ArrayList<String> roomList;
     private String ipAddress;
     private int port;
@@ -86,12 +88,15 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
     }
 
     private void createBtnActionListeners() {
-        // Fechar as salas
+        // RFA13: Uma sala só deve poder ser fechada pelo servidor. O servidor
+        // deve fechar a sala invocando o método remoto closeRoom() do controlador de sala.
         btnClose.addActionListener(e -> {
             List<String> deleteValues = list.getSelectedValuesList();
             for (String s : deleteValues) {
                 try {
                     IRoomChat room = (IRoomChat) Naming.lookup("rmi://" + getSocketValue() + "/Rooms/" + s);
+            
+                    // RFA14: Após fechar a sala o servidor deve eliminar a sala da lista de salas.
                     roomList.remove(s);
                     room.closeRoom();
                     Naming.unbind("rmi://" + getSocketValue() + "/Rooms/" + s);
@@ -126,8 +131,9 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
         });
     }
 
+    // RFA5: A solicitação da lista de salas deve ser realizada através da invocação ao 
+    // método remoto getRooms()da lista de salas roomList.
     public ArrayList<String> getRooms() {
-        System.out.println("Buscado a lista de salas");
         return roomList;
     }
 
@@ -143,7 +149,7 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
             listModel.addElement(roomName);
 
             Naming.rebind("rmi://" + getSocketValue() + "/Rooms/" + roomName, room);
-            System.out.println("Room " + roomName + " created");
+            System.out.println("Room \"" + roomName + "\" created");
             label.setText("Total Rooms: " + listModel.size());
         } catch (Exception e) {
             System.out.println("Server Error: " + e.getMessage());
